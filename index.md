@@ -1,37 +1,40 @@
-## Welcome to GitHub Pages
+## Using nuget packages in fsx file.
 
-You can use the [editor on GitHub](https://github.com/101v/Packages-in-fsx-file/edit/master/index.md) to maintain and preview the content for your website in Markdown files.
+Recently, I started tinkering with F#. One of the cool thing about F# is REPL ([Read-eval-print loop](https://en.wikipedia.org/wiki/Read%E2%80%93eval%E2%80%93print_loop)). Our tool for the REPL is F# Interactive (FSI) window. We can use it two ways: we can directly type code in FSI window, or write code in an FSX (.fsx is the file extension) script file, and select the pieces of the code we want to execute. FSI window is very primitive whereas FSX is much better to use along with IntelliSense.
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+To write code in FSX script file, I use VSCode. VSCode with [Ionide-fsharp](https://marketplace.visualstudio.com/items?itemName=Ionide.Ionide-fsharp) is an excellent combo while playing/working with F#. However, it requires quite a bit of setup before get going. 
 
-### Markdown
+Following is my experience of how I went about using nuget packages in VSCode
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+### Install [Paket] (https://fsprojects.github.io/Paket/) globally
 
-```markdown
-Syntax highlighted code block
-
-# Header 1
-## Header 2
-### Header 3
-
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
+```
+dotnet install paket -g
 ```
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+### Script folder and initial paket setup
+Create a folder and intilise it with paket 
+```
+> mkdir fsharp_practice
+> cd fsharp_practice
+> paket init
+```
+The `paket init` command creates a paket-files folder and paket.dependecies [file](https://fsprojects.github.io/Paket/dependencies-file.html) 
 
-### Jekyll Themes
+In the paket.dependencies file, the default `storage` setting is by set to `none`. What it means is that by default it does not extract packages into the "packages" folder but use a globally shared directory. Update this setting as shown below
+```
+storage: packages
+```
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/101v/Packages-in-fsx-file/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+### Add one or more packages
+Now we are ready to add required packages using following command
+```
+paket add FsCheck
+```
+This command adds `nuget FsCheck` in the paket.dependencies file, generates paket.lock, paket-files\paket.restore.cached file and packages directory with the FsCheck package content.
 
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+### Script file
+1. User relative path __SOURCE_DIRECTORY__ (**not quotation around this variable**)
+2. Use #I to defien assembly search path
+3. Use #r to reference assembly
+4. Load using open
